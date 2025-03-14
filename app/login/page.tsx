@@ -38,24 +38,20 @@ export default function LoginPage() {
 
       // 添加每日登录奖励
       // 检查是否已经有奖励数据
-      let userRewards = getUserRewards()
-      if (!userRewards) {
-        // 如果没有奖励数据，初始化一个
-        userRewards = {
-          points: 0,
-          level: { level: 1, title: "初学者" },
-          rewardHistory: [],
+      const userRewards = getUserRewards()
+      if (userRewards) {
+        const updatedRewards = addPoints(userRewards, "DAILY_LOGIN")
+        if (updatedRewards) {
+          const rewardsWithHistory = addRewardHistory(updatedRewards, "DAILY_LOGIN")
+          if (rewardsWithHistory) {
+            saveUserRewards(rewardsWithHistory)
+          }
         }
       }
 
-      // 添加每日登录奖励
-      const updatedRewards = addPoints(userRewards, "DAILY_LOGIN")
-      const rewardsWithHistory = addRewardHistory(updatedRewards, "DAILY_LOGIN")
-      saveUserRewards(rewardsWithHistory)
-
       // Redirect to home page
       router.push("/home")
-    } catch (err) {
+    } catch {
       setError("登录失败，请检查您的凭据")
     } finally {
       setIsLoading(false)

@@ -4,7 +4,7 @@ export const isAuthenticated = (): boolean => {
   try {
     const user = localStorage.getItem("user")
     return !!user
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -18,7 +18,7 @@ export const getCurrentUser = (): { name: string; email: string } | null => {
     if (!userJson) return null
 
     return JSON.parse(userJson)
-  } catch (error) {
+  } catch {
     return null
   }
 }
