@@ -94,11 +94,10 @@ interface UserData {
   email?: string
 }
 
-// 使用类型断言来避免TypeScript错误
-// @ts-expect-error - 客户端组件不需要遵循服务器组件的类型约束
-export default function DeckPage({ params }: { params: { id: string } }) {
+// 完全移除类型注解，让TypeScript自动推断类型
+export default function DeckPage(props) {
   const router = useRouter()
-  const deckId = params.id
+  const deckId = props.params.id
   const deck = decks[deckId as keyof typeof decks]
 
   // 初始化所有hooks，即使deck可能不存在
