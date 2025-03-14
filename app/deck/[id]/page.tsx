@@ -213,6 +213,15 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
     const VERTICAL_THRESHOLD = -60 // 降低阈值，使滑动更容易
     let updatedRewards = null
     if (info.offset.y < VERTICAL_THRESHOLD && currentIndex < deck.cards.length - 1) {
+      updatedRewards = {
+        points: 0,
+        leveledUp: false,
+        newLevel: { level: 1, requiredPoints: 0, title: "初学者" },
+        pointsAdded: 0,
+        action: "COMPLETE_CARD",
+        rewardHistory: [],
+      }
+    }
       // 设置过渡状态，防止动画冲突
       setIsTransitioning(true)
 
