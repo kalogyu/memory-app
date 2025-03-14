@@ -125,7 +125,7 @@ export default function RewardsPage() {
         <div className="px-6 pb-24">
           <div className="space-y-3">
             {rewards.rewardHistory && rewards.rewardHistory.length > 0 ? (
-              rewards.rewardHistory.map((record: any, index: number) => (
+              rewards.rewardHistory.map((record: { action: string; timestamp: string; points: number }, index: number) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
