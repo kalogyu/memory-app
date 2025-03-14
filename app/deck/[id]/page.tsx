@@ -95,7 +95,7 @@ interface UserData {
 }
 
 // 完全移除类型注解，让TypeScript自动推断类型
-export default function DeckPage(props: any) {
+export default function DeckPage(props: { params: { id: string } }) {
   const router = useRouter()
   const deckId = props.params.id
   const deck = decks[deckId as keyof typeof decks]
