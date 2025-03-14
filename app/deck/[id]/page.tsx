@@ -211,7 +211,6 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
 
     // 检测是否是向上方向的滑动（包括左上和右上）
     const VERTICAL_THRESHOLD = -60 // 降低阈值，使滑动更容易
-    const userRewards = getUserRewards()
     let updatedRewards = null
     if (info.offset.y < VERTICAL_THRESHOLD && currentIndex < deck.cards.length - 1) {
       // 设置过渡状态，防止动画冲突
