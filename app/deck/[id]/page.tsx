@@ -95,7 +95,6 @@ interface UserData {
 }
 
 // 使用类型断言来避免TypeScript错误
-// @ts-expect-error - 客户端组件不需要遵循服务器组件的类型约束
 
 export default function DeckPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
