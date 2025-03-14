@@ -9,7 +9,7 @@ import { getUserRewards, getUserLevel, getLevelProgress, getNextLevelPoints, LEV
 
 export default function RewardsPage() {
   const router = useRouter()
-  const [rewards, setRewards] = useState<{ points: number; level: { level: number; title: string }; rewardHistory: Array<{ date: string; reward: string }> } | null>(null)
+  const [rewards, setRewards] = useState<any>(null)
   const [animateProgress, setAnimateProgress] = useState(false)
   const [activeTab, setActiveTab] = useState<"history" | "levels">("history")
 
@@ -125,7 +125,7 @@ export default function RewardsPage() {
         <div className="px-6 pb-24">
           <div className="space-y-3">
             {rewards.rewardHistory && rewards.rewardHistory.length > 0 ? (
-              rewards.rewardHistory.map((record: { action: string; timestamp: string; points: number }, index: number) => (
+              rewards.rewardHistory.map((record: any, index: number) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
