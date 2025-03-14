@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Share2 } from "lucide-react"
 import { addPoints, addRewardHistory, saveUserRewards, getUserRewards } from "@/lib/rewards"
 import { RewardNotification } from "@/components/reward-notification"
+import { useRouter } from "next/navigation"
 
 // 模拟数据库
 const decks = {
@@ -95,6 +96,7 @@ interface UserData {
 
 // 完全移除类型注解，让TypeScript自动推断类型
 export default function DeckPage({ params }: { params: Promise<{ id: string }> }) {
+  const router = useRouter();
   const [deckId, setDeckId] = useState<string | null>(null);
 
   useEffect(() => {
