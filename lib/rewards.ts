@@ -1,3 +1,6 @@
+// 奖励系统工具函数
+
+// 用户等级配置
 export const LEVEL_CONFIG = [
   { level: 1, requiredPoints: 0, title: "初学者" },
   { level: 2, requiredPoints: 100, title: "勤奋学习者" },
@@ -22,12 +25,6 @@ export const REWARD_ACTIONS = {
   COMMUNITY_POST: { points: 10, description: "发布社区内容" },
   PERFECT_SCORE: { points: 25, description: "完美掌握卡片集" },
 }
-
-type Rewards = {
-  points: number;
-  level: number;
-  rewardHistory: Array<{ action: string; points: number; timestamp: string }>;
-};
 
 // 获取用户当前等级
 export function getUserLevel(points: number) {
@@ -67,7 +64,7 @@ export function getLevelProgress(points: number) {
 }
 
 // 添加积分并返回新的用户数据
-export function addPoints(userData: Rewards, action: keyof typeof REWARD_ACTIONS) {
+export function addPoints(userData: any, action: keyof typeof REWARD_ACTIONS) {
   if (!userData) return null
 
   const pointsToAdd = REWARD_ACTIONS[action].points
@@ -89,7 +86,7 @@ export function addPoints(userData: Rewards, action: keyof typeof REWARD_ACTIONS
 }
 
 // 保存用户奖励数据到本地存储
-export function saveUserRewards(userData: Rewards) {
+export function saveUserRewards(userData: any) {
   if (typeof window === "undefined" || !userData) return
 
   try {
@@ -131,7 +128,7 @@ export function getUserRewards() {
 }
 
 // 记录奖励历史
-export function addRewardHistory(userData: Rewards, action: keyof typeof REWARD_ACTIONS) {
+export function addRewardHistory(userData: any, action: keyof typeof REWARD_ACTIONS) {
   if (!userData) return null
 
   const rewardHistory = userData.rewardHistory || []
