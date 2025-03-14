@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { motion, type PanInfo, useMotionValue, useTransform } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Share2 } from "lucide-react"
-import { addPoints, addRewardHistory, saveUserRewards, getUserRewards, UserRewards } from "@/lib/rewards"
+import { addPoints, addRewardHistory, saveUserRewards, getUserRewards } from "@/lib/rewards"
 import { RewardNotification } from "@/components/reward-notification"
 import { useRouter } from "next/navigation"
 
@@ -211,8 +211,8 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
 
     // 检测是否是向上方向的滑动（包括左上和右上）
     const VERTICAL_THRESHOLD = -60 // 降低阈值，使滑动更容易
-
-    let updatedRewards: UserRewards | null = null
+    const userRewards = getUserRewards()
+    let updatedRewards = null
     if (info.offset.y < VERTICAL_THRESHOLD && currentIndex < deck.cards.length - 1) {
       // 设置过渡状态，防止动画冲突
       setIsTransitioning(true)
@@ -508,7 +508,7 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
                     const updatedRewards = userRewards
                       ? addPoints(userRewards, "SHARE_RESULT")
                       : { pointsAdded: 0, leveledUp: false, action: "SHARE_RESULT" }
-                    let rewardsWithHistory: UserRewards | null = null;
+                    let rewardsWithHistory =  userRewards
                     if (userRewards) {
                       rewardsWithHistory = addRewardHistory(userRewards, "SHARE_RESULT");
                     } else {
