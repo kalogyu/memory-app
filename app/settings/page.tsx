@@ -22,7 +22,7 @@ export default function SettingsPage() {
 
     try {
       setUser(JSON.parse(userData))
-    } catch (err) {
+    } catch {
       // If there's an error parsing the user data, redirect to login
       router.push("/login")
     }

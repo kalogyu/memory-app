@@ -133,17 +133,21 @@ export default function SquarePage() {
     const userRewards = getUserRewards()
     if (userRewards) {
       const updatedRewards = addPoints(userRewards, "COMMUNITY_POST")
-      const rewardsWithHistory = addRewardHistory(updatedRewards, "COMMUNITY_POST")
-      saveUserRewards(rewardsWithHistory)
+      if (updatedRewards) {
+        const rewardsWithHistory = addRewardHistory(updatedRewards, "COMMUNITY_POST")
+        if (rewardsWithHistory) {
+          saveUserRewards(rewardsWithHistory)
 
-      // 显示奖励通知
-      setRewardNotification({
-        show: true,
-        points: updatedRewards.pointsAdded,
-        message: updatedRewards.action,
-        levelUp: updatedRewards.leveledUp,
-        newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
-      })
+          // 显示奖励通知
+          setRewardNotification({
+            show: true,
+            points: updatedRewards.pointsAdded,
+            message: updatedRewards.action,
+            levelUp: updatedRewards.leveledUp,
+            newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
+          })
+        }
+      }
     }
   }
 

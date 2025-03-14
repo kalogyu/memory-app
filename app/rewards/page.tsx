@@ -5,17 +5,25 @@ import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Award, Star, TrendingUp, Gift, Clock } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
-import { getUserRewards, getUserLevel, getLevelProgress, getNextLevelPoints, LEVEL_CONFIG } from "@/lib/rewards"
+import { getUserRewards, getUserLevel, getLevelProgress, getNextLevelPoints, LEVEL_CONFIG, addPoints, saveUserRewards } from "@/lib/rewards"
+
+type Rewards = {
+  points: number;
+  level: number;
+  rewardHistory: Array<{ action: string; points: number; timestamp: string }>;
+};
 
 export default function RewardsPage() {
   const router = useRouter()
-  const [rewards, setRewards] = useState<any>(null)
+  const [rewards, setRewards] = useState<Rewards | null>(null)
   const [animateProgress, setAnimateProgress] = useState(false)
   const [activeTab, setActiveTab] = useState<"history" | "levels">("history")
 
   useEffect(() => {
     const userRewards = getUserRewards()
-    setRewards(userRewards)
+    if (userRewards) {
+      setRewards(userRewards)
+    }
 
     // Trigger progress animation after component mounts
     setTimeout(() => {
@@ -39,6 +47,11 @@ export default function RewardsPage() {
       hour: "2-digit",
       minute: "2-digit",
     })
+  }
+
+  const updatedRewards = addPoints(rewards, "COMMUNITY_POST")
+  if (updatedRewards) {
+    saveUserRewards(updatedRewards)
   }
 
   return (
@@ -125,7 +138,7 @@ export default function RewardsPage() {
         <div className="px-6 pb-24">
           <div className="space-y-3">
             {rewards.rewardHistory && rewards.rewardHistory.length > 0 ? (
-              rewards.rewardHistory.map((record: any, index: number) => (
+              rewards.rewardHistory.map((record: { action: string; points: number; timestamp: string }, index: number) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}

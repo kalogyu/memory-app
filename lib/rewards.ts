@@ -23,6 +23,12 @@ export const REWARD_ACTIONS = {
   PERFECT_SCORE: { points: 25, description: "完美掌握卡片集" },
 }
 
+type Rewards = {
+  points: number;
+  level: number;
+  rewardHistory: Array<{ action: string; points: number; timestamp: string }>;
+};
+
 // 获取用户当前等级
 export function getUserLevel(points: number) {
   for (let i = LEVEL_CONFIG.length - 1; i >= 0; i--) {
@@ -61,7 +67,7 @@ export function getLevelProgress(points: number) {
 }
 
 // 添加积分并返回新的用户数据
-export function addPoints(userData: any, action: keyof typeof REWARD_ACTIONS) {
+export function addPoints(userData: Rewards, action: keyof typeof REWARD_ACTIONS) {
   if (!userData) return null
 
   const pointsToAdd = REWARD_ACTIONS[action].points
@@ -83,7 +89,7 @@ export function addPoints(userData: any, action: keyof typeof REWARD_ACTIONS) {
 }
 
 // 保存用户奖励数据到本地存储
-export function saveUserRewards(userData: any) {
+export function saveUserRewards(userData: Rewards) {
   if (typeof window === "undefined" || !userData) return
 
   try {
@@ -125,7 +131,7 @@ export function getUserRewards() {
 }
 
 // 记录奖励历史
-export function addRewardHistory(userData: any, action: keyof typeof REWARD_ACTIONS) {
+export function addRewardHistory(userData: Rewards, action: keyof typeof REWARD_ACTIONS) {
   if (!userData) return null
 
   const rewardHistory = userData.rewardHistory || []
