@@ -79,7 +79,7 @@ const decks = {
       { id: 12, front: "英语单词'Lemon'的中文意思是？", back: "柠檬" },
       { id: 13, front: "英语单词'Mountain'的中文意思是？", back: "山" },
       { id: 14, front: "英语单词'Night'的中文意思是？", back: "夜晚" },
-      { id: 15, front: "英语单词'Ocean'的中文意思是？", back: "海洋" },
+      { id: 15, front: "���语单词'Ocean'的中文意思是？", back: "海洋" },
       { id: 16, front: "英语单词'Pencil'的中文意思是？", back: "铅笔" },
       { id: 17, front: "英语单词'Queen'的中文意思是？", back: "女王" },
       { id: 18, front: "英语单词'River'的中文意思是？", back: "河流" },
@@ -89,11 +89,17 @@ const decks = {
   },
 }
 
+interface UserData {
+  name: string
+  email?: string
+}
+
 export default function DeckPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const deckId = params.id
   const deck = decks[deckId as keyof typeof decks]
 
+  // 初始化所有hooks，即使deck可能不存在
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -107,41 +113,8 @@ export default function DeckPage({ params }: { params: { id: string } }) {
     newLevel?: { level: number; title: string }
   } | null>(null)
 
-  // 获取当前用户
-  const getUser = useCallback(() => {
-    try {
-      if (typeof window !== "undefined") {
-        return JSON.parse(localStorage.getItem("user") || '{"name":"用户"}')
-      }
-      return { name: "用户" }
-    } catch (error) {
-      console.error("Failed to parse user from localStorage:", error)
-      return { name: "用户" } // Provide a default value in case of parsing errors
-    }
-  }, [])
-
-  const [user, setUser] = useState(getUser())
-
-  useEffect(() => {
-    setUser(getUser())
-  }, [getUser])
-
-  // 如果找不到卡片集，返回首页
-  useEffect(() => {
-    if (!deck) {
-      router.push("/")
-    }
-
-    // Trigger progress animation after component mounts
-    setTimeout(() => {
-      setAnimateProgress(true)
-    }, 300)
-  }, [deck, router])
-
-  if (!deck) return null
-
-  // 跟踪每张卡片的翻转状态
-  const [flipped, setFlipped] = useState<boolean[]>(new Array(deck.cards.length).fill(false))
+  // 初始化flipped状态，如果deck不存在则使用空数组
+  const [flipped, setFlipped] = useState<boolean[]>([])
 
   // 用于控制卡片的位置
   const x = useMotionValue(0)
@@ -157,11 +130,50 @@ export default function DeckPage({ params }: { params: { id: string } }) {
   const scale = useTransform(y, [0, -100], [1, 0.95])
   const rotate = useTransform(x, [-100, 0, 100], [-5, 0, 5])
 
+  // 获取当前用户
+  const getUser = useCallback(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const userData = localStorage.getItem("user")
+        return userData ? (JSON.parse(userData) as UserData) : { name: "用户" }
+      }
+      return { name: "用户" }
+    } catch (error) {
+      console.error("Failed to parse user from localStorage:", error)
+      return { name: "用户" } // Provide a default value in case of parsing errors
+    }
+  }, [])
+
+  const [user, setUser] = useState<UserData>({ name: "用户" })
+
+  useEffect(() => {
+    setUser(getUser())
+  }, [getUser])
+
+  // 如果找不到卡片集，返回首页
+  useEffect(() => {
+    if (!deck) {
+      router.push("/")
+      return
+    }
+
+    // 初始化flipped状态
+    setFlipped(new Array(deck.cards.length).fill(false))
+
+    // Trigger progress animation after component mounts
+    setTimeout(() => {
+      setAnimateProgress(true)
+    }, 300)
+  }, [deck, router])
+
+  // 如果找不到卡片集，提前返回
+  if (!deck) return null
+
   const handleDragStart = () => {
     setIsDragging(true)
   }
 
-  const handleDrag = (_: any, info: PanInfo) => {
+  const handleDrag = (_: unknown, info: PanInfo) => {
     // 允许任何方向的拖动，但记录位置
     x.set(info.offset.x)
     y.set(info.offset.y)
@@ -173,12 +185,13 @@ export default function DeckPage({ params }: { params: { id: string } }) {
     }
   }
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
     setIsDragging(false)
 
     // 检测是否是向上方向的滑动（包括左上和右上）
     const VERTICAL_THRESHOLD = -60 // 降低阈值，使滑动更容易
 
+    let updatedRewards = null // Initialize outside the if block
     if (info.offset.y < VERTICAL_THRESHOLD && currentIndex < deck.cards.length - 1) {
       // 设置过渡状态，防止动画冲突
       setIsTransitioning(true)
@@ -209,7 +222,7 @@ export default function DeckPage({ params }: { params: { id: string } }) {
         // 添加完成卡片的奖励
         const userRewards = getUserRewards()
 
-        const updatedRewards = userRewards
+        updatedRewards = userRewards
           ? addPoints(userRewards, "COMPLETE_CARD")
           : { pointsAdded: 0, leveledUp: false, action: "COMPLETE_CARD" }
         const rewardsWithHistory = userRewards
@@ -218,15 +231,6 @@ export default function DeckPage({ params }: { params: { id: string } }) {
         if (userRewards) {
           saveUserRewards(rewardsWithHistory)
         }
-
-        // 显示奖励通知
-        setRewardNotification({
-          show: true,
-          points: updatedRewards.pointsAdded,
-          message: updatedRewards.action,
-          levelUp: updatedRewards.leveledUp,
-          newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
-        })
       }
     } else {
       // 如果不是有效的滑动，重置位置
@@ -242,7 +246,7 @@ export default function DeckPage({ params }: { params: { id: string } }) {
       // 添加完成卡片集的奖励
       const userRewards = getUserRewards()
 
-      const updatedRewards = userRewards
+      updatedRewards = userRewards
         ? addPoints(userRewards, "COMPLETE_DECK")
         : { pointsAdded: 0, leveledUp: false, action: "COMPLETE_DECK" }
       const rewardsWithHistory = userRewards
@@ -253,15 +257,26 @@ export default function DeckPage({ params }: { params: { id: string } }) {
       }
 
       // 完成卡片集的奖励通知会在模态框关闭后显示
-      setTimeout(() => {
-        setRewardNotification({
-          show: true,
-          points: updatedRewards.pointsAdded,
-          message: updatedRewards.action,
-          levelUp: updatedRewards.leveledUp,
-          newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
-        })
-      }, 500)
+      // setTimeout(() => {
+      //   setRewardNotification({
+      //     show: true,
+      //     points: updatedRewards.pointsAdded,
+      //     message: updatedRewards.action,
+      //     levelUp: updatedRewards.leveledUp,
+      //     newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
+      //   });
+      // }, 500);
+    }
+
+    // 显示奖励通知
+    if (updatedRewards) {
+      setRewardNotification({
+        show: true,
+        points: updatedRewards.pointsAdded,
+        message: updatedRewards.action,
+        levelUp: updatedRewards.leveledUp,
+        newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
+      })
     }
   }
 
