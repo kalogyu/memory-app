@@ -97,9 +97,15 @@ interface UserData {
 // 使用类型断言来避免TypeScript错误
 
 export default function DeckPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter()
-  const deckId = params.id
-  const deck = decks[deckId as keyof typeof decks]
+  const [deckId, setDeckId] = useState<string | null>(null);
+
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setDeckId(resolvedParams.id);
+    });
+  }, [params]);
+
+  const deck = deckId ? decks[deckId as keyof typeof decks] : null;
 
   // 初始化所有hooks，即使deck可能不存在
   const [currentIndex, setCurrentIndex] = useState(0)
