@@ -94,7 +94,15 @@ interface UserData {
   email?: string
 }
 
-export default function DeckPage({ params }: { params: { id: string } }) {
+// 修改这里的类型定义
+interface DeckPageProps {
+  params: {
+    id: string
+  }
+  searchParams?: Record<string, string | string[] | undefined>
+}
+
+export default function DeckPage({ params }: DeckPageProps) {
   const router = useRouter()
   const deckId = params.id
   const deck = decks[deckId as keyof typeof decks]
