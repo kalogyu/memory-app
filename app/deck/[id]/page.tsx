@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { motion, type PanInfo, useMotionValue, useTransform } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
-import { useRouter } from "next/navigation"
 import { ArrowLeft, Share2 } from "lucide-react"
 import { addPoints, addRewardHistory, saveUserRewards, getUserRewards } from "@/lib/rewards"
 import { RewardNotification } from "@/components/reward-notification"
