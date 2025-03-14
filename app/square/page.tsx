@@ -86,22 +86,24 @@ export default function SquarePage() {
     setUser(userData)
   }, [router])
 
-  const handleLike = (postId: number) => {
-    setPosts(
-      posts.map((post) => {
-        if (post.id === postId) {
-          return {
-            ...post,
-            likes: post.liked ? post.likes - 1 : post.likes + 1,
-            liked: !post.liked,
-          }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const handleLike = (postId: number) => {
+  setPosts(
+    posts.map((post) => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          likes: post.liked ? post.likes - 1 : post.likes + 1,
+          liked: !post.liked,
         }
-        return post
-      }),
-    )
-  }
+      }
+      return post
+    }),
+  )
+}
 
-  const handleComment = (postId: number) => {
+
+  const handleComment = () => {
     if (!newComment.trim()) return
 
     // In a real app, you would send this to an API
@@ -133,21 +135,17 @@ export default function SquarePage() {
     const userRewards = getUserRewards()
     if (userRewards) {
       const updatedRewards = addPoints(userRewards, "COMMUNITY_POST")
-      if (updatedRewards) {
-        const rewardsWithHistory = addRewardHistory(updatedRewards, "COMMUNITY_POST")
-        if (rewardsWithHistory) {
-          saveUserRewards(rewardsWithHistory)
+      const rewardsWithHistory = addRewardHistory(updatedRewards, "COMMUNITY_POST")
+      saveUserRewards(rewardsWithHistory)
 
-          // 显示奖励通知
-          setRewardNotification({
-            show: true,
-            points: updatedRewards.pointsAdded,
-            message: updatedRewards.action,
-            levelUp: updatedRewards.leveledUp,
-            newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
-          })
-        }
-      }
+      // 显示奖励通知
+      setRewardNotification({
+        show: true,
+        points: updatedRewards.pointsAdded,
+        message: updatedRewards.action,
+        levelUp: updatedRewards.leveledUp,
+        newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
+      })
     }
   }
 
@@ -279,7 +277,7 @@ export default function SquarePage() {
                     className="bg-[#0F2318] border-[#2A3C33] pr-10 focus-visible:ring-[#4CAF50] text-[#E0E7E3]"
                   />
                   <button
-                    onClick={() => handleComment(post.id)}
+                    onClick={handleComment}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#4CAF50]"
                   >
                     <Send className="w-4 h-4" />

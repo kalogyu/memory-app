@@ -26,6 +26,31 @@ export const REWARD_ACTIONS = {
   PERFECT_SCORE: { points: 25, description: "完美掌握卡片集" },
 }
 
+// 定义用户奖励数据类型
+interface UserRewards {
+  points: number
+  level?: {
+    level: number
+    title: string
+    requiredPoints: number
+  }
+  rewardHistory?: RewardHistoryItem[]
+  leveledUp?: boolean
+  newLevel?: {
+    level: number
+    title: string
+  }
+  pointsAdded?: number
+  action?: string
+}
+
+// 定义奖励历史记录项类型
+interface RewardHistoryItem {
+  action: string
+  points: number
+  timestamp: string
+}
+
 // 获取用户当前等级
 export function getUserLevel(points: number) {
   for (let i = LEVEL_CONFIG.length - 1; i >= 0; i--) {
@@ -64,7 +89,7 @@ export function getLevelProgress(points: number) {
 }
 
 // 添加积分并返回新的用户数据
-export function addPoints(userData: any, action: keyof typeof REWARD_ACTIONS) {
+export function addPoints(userData: UserRewards, action: keyof typeof REWARD_ACTIONS) {
   if (!userData) return null
 
   const pointsToAdd = REWARD_ACTIONS[action].points
@@ -86,7 +111,7 @@ export function addPoints(userData: any, action: keyof typeof REWARD_ACTIONS) {
 }
 
 // 保存用户奖励数据到本地存储
-export function saveUserRewards(userData: any) {
+export function saveUserRewards(userData: UserRewards) {
   if (typeof window === "undefined" || !userData) return
 
   try {
@@ -104,7 +129,7 @@ export function saveUserRewards(userData: any) {
 }
 
 // 从本地存储获取用户奖励数据
-export function getUserRewards() {
+export function getUserRewards(): UserRewards | null {
   if (typeof window === "undefined") return null
 
   try {
@@ -120,7 +145,7 @@ export function getUserRewards() {
       return defaultRewards
     }
 
-    return JSON.parse(data)
+    return JSON.parse(data) as UserRewards
   } catch (error) {
     console.error("Failed to get user rewards:", error)
     return null
@@ -128,7 +153,7 @@ export function getUserRewards() {
 }
 
 // 记录奖励历史
-export function addRewardHistory(userData: any, action: keyof typeof REWARD_ACTIONS) {
+export function addRewardHistory(userData: UserRewards, action: keyof typeof REWARD_ACTIONS) {
   if (!userData) return null
 
   const rewardHistory = userData.rewardHistory || []
