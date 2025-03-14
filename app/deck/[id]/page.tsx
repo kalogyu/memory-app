@@ -95,10 +95,16 @@ interface UserData {
 }
 
 // 完全移除类型注解，让TypeScript自动推断类型
-export default function DeckPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const deckId = params.id
-  const deck = decks[deckId as keyof typeof decks]
+export default function DeckPage({ params }: { params: Promise<{ id: string }> }) {
+  const [deckId, setDeckId] = useState<string | null>(null);
+
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setDeckId(resolvedParams.id);
+    });
+  }, [params]);
+
+  const deck = deckId ? decks[deckId as keyof typeof decks] : null;
 
   // 初始化所有hooks，即使deck可能不存在
   const [currentIndex, setCurrentIndex] = useState(0)
