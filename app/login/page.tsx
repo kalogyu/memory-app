@@ -43,15 +43,24 @@ export default function LoginPage() {
         // 如果没有奖励数据，初始化一个
         userRewards = {
           points: 0,
-          level: { level: 1, title: "初学者" },
+          level: {
+            level: 1, title: "初学者",
+            requiredPoints: 0
+          },
           rewardHistory: [],
         }
       }
 
       // 添加每日登录奖励
       const updatedRewards = addPoints(userRewards, "DAILY_LOGIN")
-      const rewardsWithHistory = addRewardHistory(updatedRewards, "DAILY_LOGIN")
-      saveUserRewards(rewardsWithHistory)
+      if (updatedRewards) {
+        if (updatedRewards) {
+          const rewardsWithHistory = addRewardHistory(updatedRewards, "DAILY_LOGIN")
+          if (rewardsWithHistory) {
+            saveUserRewards(rewardsWithHistory)
+          }
+        }
+      }
 
       // Redirect to home page
       router.push("/home")

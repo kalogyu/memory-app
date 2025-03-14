@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { motion, type PanInfo, useMotionValue, useTransform } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Share2 } from "lucide-react"
-import { addPoints, addRewardHistory, saveUserRewards, getUserRewards } from "@/lib/rewards"
+import { addPoints, addRewardHistory, saveUserRewards, getUserRewards, UserRewards } from "@/lib/rewards"
 import { RewardNotification } from "@/components/reward-notification"
 import { useRouter } from "next/navigation"
 
@@ -212,7 +212,7 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
     // 检测是否是向上方向的滑动（包括左上和右上）
     const VERTICAL_THRESHOLD = -60 // 降低阈值，使滑动更容易
 
-    let updatedRewards = null // Initialize outside the if block
+    let updatedRewards: UserRewards | null = null
     if (info.offset.y < VERTICAL_THRESHOLD && currentIndex < deck.cards.length - 1) {
       // 设置过渡状态，防止动画冲突
       setIsTransitioning(true)
@@ -243,14 +243,24 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
         // 添加完成卡片的奖励
         const userRewards = getUserRewards()
 
-        updatedRewards = userRewards
-          ? addPoints(userRewards, "COMPLETE_CARD")
-          : { pointsAdded: 0, leveledUp: false, action: "COMPLETE_CARD" }
-        const rewardsWithHistory = userRewards
-          ? addRewardHistory(updatedRewards, "COMPLETE_CARD")
-          : { ...updatedRewards, rewardHistory: [] }
         if (userRewards) {
-          saveUserRewards(rewardsWithHistory)
+          updatedRewards = addPoints(userRewards, "COMPLETE_CARD")
+        } else {
+          updatedRewards = {
+            points: 0,
+            leveledUp: false,
+            newLevel: { level: 1, title: "初学者" },
+            pointsAdded: 0,
+            action: "COMPLETE_CARD",
+            rewardHistory: [],
+          }
+        }
+
+        if (updatedRewards) {
+          const rewardsWithHistory = addRewardHistory(updatedRewards, "COMPLETE_CARD")
+          if (rewardsWithHistory) {
+            saveUserRewards(rewardsWithHistory)
+          }
         }
       }
     } else {
@@ -267,14 +277,24 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
       // 添加完成卡片集的奖励
       const userRewards = getUserRewards()
 
-      updatedRewards = userRewards
-        ? addPoints(userRewards, "COMPLETE_DECK")
-        : { pointsAdded: 0, leveledUp: false, action: "COMPLETE_DECK" }
-      const rewardsWithHistory = userRewards
-        ? addRewardHistory(updatedRewards, "COMPLETE_DECK")
-        : { ...updatedRewards, rewardHistory: [] }
       if (userRewards) {
-        saveUserRewards(rewardsWithHistory)
+        updatedRewards = addPoints(userRewards, "COMPLETE_DECK")
+      } else {
+        updatedRewards = {
+          points: 0,
+          leveledUp: false,
+          newLevel: { level: 1, title: "初学者" },
+          pointsAdded: 0,
+          action: "COMPLETE_DECK",
+          rewardHistory: [],
+        }
+      }
+
+      if (updatedRewards) {
+        const rewardsWithHistory = addRewardHistory(updatedRewards, "COMPLETE_DECK")
+        if (rewardsWithHistory) {
+          saveUserRewards(rewardsWithHistory)
+        }
       }
     }
 
@@ -282,9 +302,9 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
     if (updatedRewards) {
       setRewardNotification({
         show: true,
-        points: updatedRewards.pointsAdded,
-        message: updatedRewards.action,
-        levelUp: updatedRewards.leveledUp,
+        points: updatedRewards.pointsAdded ?? 0,
+        message: updatedRewards.action ?? '',
+        levelUp: updatedRewards.leveledUp ?? false,
         newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
       })
     }
@@ -488,24 +508,35 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
                     const updatedRewards = userRewards
                       ? addPoints(userRewards, "SHARE_RESULT")
                       : { pointsAdded: 0, leveledUp: false, action: "SHARE_RESULT" }
-                    const rewardsWithHistory = userRewards
-                      ? addRewardHistory(updatedRewards, "SHARE_RESULT")
-                      : { ...updatedRewards, rewardHistory: [] }
+                    let rewardsWithHistory: UserRewards | null = null;
                     if (userRewards) {
-                      saveUserRewards(rewardsWithHistory)
+                      rewardsWithHistory = addRewardHistory(userRewards, "SHARE_RESULT");
+                    } else {
+                      rewardsWithHistory = {
+                        points: 0,
+                        leveledUp: false,
+                        newLevel: undefined,
+                        pointsAdded: 0,
+                        action: "SHARE_RESULT",
+                        rewardHistory: [],
+                      };
+                    }
+                    if (rewardsWithHistory) {
+                      saveUserRewards(rewardsWithHistory);
                     }
 
                     // 显示奖励通知
-                    setRewardNotification({
-                      show: true,
-                      points: updatedRewards.pointsAdded,
-                      message: updatedRewards.action,
-                      levelUp: updatedRewards.leveledUp,
-                      newLevel: updatedRewards.newLevel ? updatedRewards.newLevel : undefined,
-                    })
+                    if (updatedRewards) {
+                      setRewardNotification({
+                        show: true,
+                        points: updatedRewards.pointsAdded,
+                        message: updatedRewards.action,
+                        levelUp: updatedRewards.leveledUp,
+                      });
+                    }
 
-                    setShowCompleteModal(false)
-                    router.push("/square")
+                    setShowCompleteModal(false);
+                    router.push("/square");
                   }}
                   className="flex items-center justify-center mt-2 text-[#8BAF92]"
                 >
