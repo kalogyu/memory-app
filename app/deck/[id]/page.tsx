@@ -79,7 +79,7 @@ const decks = {
       { id: 12, front: "英语单词'Lemon'的中文意思是？", back: "柠檬" },
       { id: 13, front: "英语单词'Mountain'的中文意思是？", back: "山" },
       { id: 14, front: "英语单词'Night'的中文意思是？", back: "夜晚" },
-      { id: 15, front: "���语单词'Ocean'的中文意思是？", back: "海洋" },
+      { id: 15, front: "英语单词'Ocean'的中文意思是？", back: "海洋" },
       { id: 16, front: "英语单词'Pencil'的中文意思是？", back: "铅笔" },
       { id: 17, front: "英语单词'Queen'的中文意思是？", back: "女王" },
       { id: 18, front: "英语单词'River'的中文意思是？", back: "河流" },
@@ -138,19 +138,20 @@ export default function DeckPage({ params }: { params: { id: string } }) {
         return userData ? (JSON.parse(userData) as UserData) : { name: "用户" }
       }
       return { name: "用户" }
-    } catch (error) {
-      console.error("Failed to parse user from localStorage:", error)
+    } catch (_error) {
+      console.error("Failed to parse user from localStorage")
       return { name: "用户" } // Provide a default value in case of parsing errors
     }
   }, [])
 
   const [user, setUser] = useState<UserData>({ name: "用户" })
 
+  // 设置用户
   useEffect(() => {
     setUser(getUser())
   }, [getUser])
 
-  // 如果找不到卡片集，返回首页
+  // 处理卡片集不存在的情况和初始化flipped状态
   useEffect(() => {
     if (!deck) {
       router.push("/")
@@ -161,10 +162,22 @@ export default function DeckPage({ params }: { params: { id: string } }) {
     setFlipped(new Array(deck.cards.length).fill(false))
 
     // Trigger progress animation after component mounts
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setAnimateProgress(true)
     }, 300)
+
+    return () => clearTimeout(timer)
   }, [deck, router])
+
+  // 重置位置
+  useEffect(() => {
+    if (deck) {
+      // 确保deck存在
+      x.set(0)
+      y.set(0)
+      dragDistance.current = { x: 0, y: 0 }
+    }
+  }, [currentIndex, x, y, deck])
 
   // 如果找不到卡片集，提前返回
   if (!deck) return null
@@ -255,17 +268,6 @@ export default function DeckPage({ params }: { params: { id: string } }) {
       if (userRewards) {
         saveUserRewards(rewardsWithHistory)
       }
-
-      // 完成卡片集的奖励通知会在模态框关闭后显示
-      // setTimeout(() => {
-      //   setRewardNotification({
-      //     show: true,
-      //     points: updatedRewards.pointsAdded,
-      //     message: updatedRewards.action,
-      //     levelUp: updatedRewards.leveledUp,
-      //     newLevel: updatedRewards.leveledUp ? updatedRewards.newLevel : undefined,
-      //   });
-      // }, 500);
     }
 
     // 显示奖励通知
@@ -290,13 +292,6 @@ export default function DeckPage({ params }: { params: { id: string } }) {
       setFlipped(newFlipped)
     }
   }
-
-  // 重置位置
-  useEffect(() => {
-    x.set(0)
-    y.set(0)
-    dragDistance.current = { x: 0, y: 0 }
-  }, [currentIndex, x, y])
 
   // 计算进度百分比
   const progressPercentage = (currentIndex / (deck.cards.length - 1)) * 100
