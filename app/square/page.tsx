@@ -86,22 +86,20 @@ export default function SquarePage() {
     setUser(userData)
   }, [router])
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const handleLike = (postId: number) => {
-  setPosts(
-    posts.map((post) => {
-      if (post.id === postId) {
-        return {
-          ...post,
-          likes: post.liked ? post.likes - 1 : post.likes + 1,
-          liked: !post.liked,
+  const handleLike = (postId: number) => {
+    setPosts(
+      posts.map((post) => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            likes: post.liked ? post.likes - 1 : post.likes + 1,
+            liked: !post.liked,
+          }
         }
-      }
-      return post
-    }),
-  )
-}
-
+        return post
+      }),
+    )
+  }
 
   const handleComment = () => {
     if (!newComment.trim()) return

@@ -8,11 +8,11 @@ import { BookOpen, Brain, Award, Settings, Plus, ChevronRight, Search, Trophy } 
 export default function HomePage() {
   const router = useRouter()
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
-  const [animateProgress, setAnimateProgress] = useState(false)
-  const [recentlyViewed] = useState<Array<{ id: string; title: string; cards: number; progress: number }>>([
+  const [recentlyViewed, setRecentlyViewed] = useState([
     { id: "science", title: "科学知识", cards: 10, progress: 40 },
     { id: "history", title: "历史事件", cards: 15, progress: 25 },
   ])
+  const [animateProgress, setAnimateProgress] = useState(false)
 
   const categories = [
     { id: "science", title: "科学知识", icon: <Brain className="w-5 h-5" />, cards: 10 },
@@ -36,8 +36,9 @@ export default function HomePage() {
       setTimeout(() => {
         setAnimateProgress(true)
       }, 300)
-    } catch {
-      // Handle error
+    } catch (err) {
+      // If there's an error parsing the user data, redirect to login
+      router.push("/login")
     }
   }, [router])
 
@@ -85,7 +86,7 @@ export default function HomePage() {
           >
             <h2 className="text-lg font-medium mb-4">继续学习</h2>
             <div className="space-y-3">
-              {recentlyViewed.map((deck: { id: string; title: string; cards: number; progress: number }, index: number) => (
+              {recentlyViewed.map((deck, index) => (
                 <motion.div
                   key={deck.id}
                   whileTap={{ scale: 0.98 }}

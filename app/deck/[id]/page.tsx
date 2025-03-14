@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { motion, type PanInfo, useMotionValue, useTransform } from "framer-motion"
 import { Progress } from "@/components/ui/progress"
+import { useRouter } from "next/navigation"
 import { ArrowLeft, Share2 } from "lucide-react"
 import { addPoints, addRewardHistory, saveUserRewards, getUserRewards } from "@/lib/rewards"
 import { RewardNotification } from "@/components/reward-notification"
@@ -94,17 +95,11 @@ interface UserData {
 }
 
 // 使用类型断言来避免TypeScript错误
-
-export default function DeckPage({ params }: { params: Promise<{ id: string }> }) {
-  const [deckId, setDeckId] = useState<string | null>(null);
-
-  useEffect(() => {
-    params.then((resolvedParams) => {
-      setDeckId(resolvedParams.id);
-    });
-  }, [params]);
-
-  const deck = deckId ? decks[deckId as keyof typeof decks] : null;
+// @ts-expect-error - 客户端组件不需要遵循服务器组件的类型约束
+export default function DeckPage({ params }: { params: { id: string } }) {
+  const router = useRouter()
+  const deckId = params.id
+  const deck = decks[deckId as keyof typeof decks]
 
   // 初始化所有hooks，即使deck可能不存在
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -145,7 +140,7 @@ export default function DeckPage({ params }: { params: Promise<{ id: string }> }
         return userData ? (JSON.parse(userData) as UserData) : { name: "用户" }
       }
       return { name: "用户" }
-    } catch{
+    } catch (_error) {
       console.error("Failed to parse user from localStorage")
       return { name: "用户" } // Provide a default value in case of parsing errors
     }
