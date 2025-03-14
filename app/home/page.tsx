@@ -8,7 +8,7 @@ import { BookOpen, Brain, Award, Settings, Plus, ChevronRight, Search, Trophy } 
 export default function HomePage() {
   const router = useRouter()
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
-  const [recentlyViewed, setRecentlyViewed] = useState([
+  const [recentlyViewed, _setRecentlyViewed] = useState([
     { id: "science", title: "科学知识", cards: 10, progress: 40 },
     { id: "history", title: "历史事件", cards: 15, progress: 25 },
   ])

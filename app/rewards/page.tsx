@@ -7,9 +7,34 @@ import { ArrowLeft, Award, Star, TrendingUp, Gift, Clock } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { getUserRewards, getUserLevel, getLevelProgress, getNextLevelPoints, LEVEL_CONFIG } from "@/lib/rewards"
 
+// 用户奖励数据接口
+interface UserRewards {
+  points: number
+  level?: {
+    level: number
+    title: string
+    requiredPoints: number
+  }
+  rewardHistory?: RewardHistoryItem[]
+  leveledUp?: boolean
+  newLevel?: {
+    level: number
+    title: string
+  }
+  pointsAdded?: number
+  action?: string
+}
+
+// 奖励历史记录项接口
+interface RewardHistoryItem {
+  action: string
+  points: number
+  timestamp: string
+}
+
 export default function RewardsPage() {
   const router = useRouter()
-  const [rewards, setRewards] = useState<any>(null)
+  const [rewards, setRewards] = useState<UserRewards | null>(null)
   const [animateProgress, setAnimateProgress] = useState(false)
   const [activeTab, setActiveTab] = useState<"history" | "levels">("history")
 
@@ -125,7 +150,7 @@ export default function RewardsPage() {
         <div className="px-6 pb-24">
           <div className="space-y-3">
             {rewards.rewardHistory && rewards.rewardHistory.length > 0 ? (
-              rewards.rewardHistory.map((record: any, index: number) => (
+              rewards.rewardHistory.map((record: RewardHistoryItem, index: number) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
