@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
 
       // Show success message
       setIsSubmitted(true)
-    } catch (err) {
+    } catch {
       setError("发送重置链接失败，请稍后再试")
     } finally {
       setIsLoading(false)

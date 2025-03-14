@@ -45,7 +45,7 @@ export default function RegisterPage() {
 
       // Redirect to home page
       router.push("/home")
-    } catch (err) {
+    } catch {
       setError("注册失败，请稍后再试")
     } finally {
       setIsLoading(false)

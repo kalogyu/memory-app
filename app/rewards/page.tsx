@@ -9,7 +9,7 @@ import { getUserRewards, getUserLevel, getLevelProgress, getNextLevelPoints, LEV
 
 export default function RewardsPage() {
   const router = useRouter()
-  const [rewards, setRewards] = useState<any>(null)
+  const [rewards, setRewards] = useState<{ points: number; level: { level: number; title: string }; rewardHistory: Array<{ date: string; reward: string }> } | null>(null)
   const [animateProgress, setAnimateProgress] = useState(false)
   const [activeTab, setActiveTab] = useState<"history" | "levels">("history")
 

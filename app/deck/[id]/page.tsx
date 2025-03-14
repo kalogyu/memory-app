@@ -140,7 +140,7 @@ export default function DeckPage({ params }: { params: { id: string } }) {
         return userData ? (JSON.parse(userData) as UserData) : { name: "用户" }
       }
       return { name: "用户" }
-    } catch (_error) {
+    } catch{
       console.error("Failed to parse user from localStorage")
       return { name: "用户" } // Provide a default value in case of parsing errors
     }

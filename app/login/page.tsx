@@ -55,7 +55,7 @@ export default function LoginPage() {
 
       // Redirect to home page
       router.push("/home")
-    } catch (err) {
+    } catch {
       setError("登录失败，请检查您的凭据")
     } finally {
       setIsLoading(false)
